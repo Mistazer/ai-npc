@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Runtime data (per-NPC memory, logs)
+player2-local/data/
+*.log
+
+# Local config overrides
+player2-local/config.toml
+
+# OS
+.DS_Store

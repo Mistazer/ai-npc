@@ -1,0 +1,36 @@
+# Copy to config.toml and edit. Environment variables (P2L_*) override these.
+
+# Bridge listener — must stay on 127.0.0.1:4315 so the mod finds it.
+host = "127.0.0.1"
+port = 4315
+
+# Ollama
+ollama_base_url = "http://127.0.0.1:11434"
+ollama_model = "llama3.2"          # try qwen3:14b, gemma3:12b, mistral, ...
+ollama_temperature = 0.8
+ollama_timeout = 120.0
+
+# Return a canned reply instead of calling Ollama (handy for testing).
+mock_llm = false
+
+# Optional long-term memory: summarize old turns into "facts".
+summary_model = ""
+max_history = 64
+
+# Default NPC personality (see personalities.py): companion | miner | builder | knight | farmer | explorer
+default_personality = "companion"
+
+# Persist each NPC's memory to disk so it remembers across sessions.
+persist_memory = true
+data_dir = "data"
+
+# Reported to the mod (mimics a real Player2 App version string).
+game_key = "ai-npc-local"
+client_version = "1.4.0-local"
+
+# Emit assistant replies token-by-token over SSE (off until schema is confirmed).
+stream_tokens = false
+
+# TTS / STT are stubbed unless a real backend is wired in.
+enable_tts = false
+tts_voice = "fr-FR"
