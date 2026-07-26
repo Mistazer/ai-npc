@@ -70,7 +70,7 @@
     let editing = null;
 
     async function load() {
-      const res = await fetch('/api/personalties');
+      const res = await fetch('/api/personalities');
       const list = await res.json();
       const el = $('list'); el.innerHTML = '';
       list.forEach(p => {
@@ -89,7 +89,7 @@
     }
 
     async function edit(id) {
-      const res = await fetch('/api/personalties');
+      const res = await fetch('/api/personalities');
       const list = await res.json();
       const p = list.find(x => x.id === id);
       if (!p) return;
@@ -113,7 +113,7 @@
         tts: $('tts').checked
       };
       const method = editing ? 'PUT' : 'POST';
-      const url = editing ? `/api/personalties/${editing}` : '/api/personalties';
+      const url = editing ? `/api/personalities/${editing}` : '/api/personalities';
       await fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
       editing = null; $('name').value=''; $('prompt').value='';
       load();
@@ -121,12 +121,12 @@
 
     async function del(id) {
       if (!confirm('Supprimer ' + id + ' ?')) return;
-      await fetch('/api/personalties/' + id, { method: 'DELETE' });
+      await fetch('/api/personalities/' + id, { method: 'DELETE' });
       load();
     }
 
     async function apply(id) {
-      const res = await fetch('/api/personalties/' + id + '/apply');
+      const res = await fetch('/api/personalities/' + id + '/apply');
       const a = await res.json();
       alert("Colle dans SecondBrain (/secondbrain → Edit) :\n\n" +
         "Name of the NPC : " + a.npc_name + "\n" +
@@ -139,7 +139,7 @@
       if (!editing) { alert('Enregistre d\'abord la personnalité.'); return; }
       const f = $('png').files[0]; if (!f) return;
       const fd = new FormData(); fd.append('file', f);
-      await fetch('/api/personalties/' + editing + '/skin', { method: 'POST', body: fd });
+      await fetch('/api/personalities/' + editing + '/skin', { method: 'POST', body: fd });
       load();
     }
 
