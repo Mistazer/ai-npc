@@ -1,0 +1,216 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0a0c12;
+  --bg-elevated: #11141d;
+  --panel: #161a26;
+  --panel-hover: #1d2231;
+  --border: #262c3d;
+  --border-strong: #333b52;
+  --text: #e8ecf5;
+  --muted: #98a2bd;
+  --muted-dim: #6b7590;
+  --accent: #7c9cff;
+  --accent-soft: rgba(124, 156, 255, 0.14);
+
+  --tier-splus: #ff5470;
+  --tier-s: #ff8f4d;
+  --tier-a: #ffd23f;
+  --tier-b: #62d98a;
+  --tier-c: #56b6ff;
+  --tier-d: #9aa4bd;
+
+  --r-5: #ffb938;
+  --r-4: #a682e0;
+  --r-3: #5c9cd6;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(1000px 500px at 12% -10%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
+    radial-gradient(800px 400px at 88% 0%, rgba(255, 84, 112, 0.07), transparent 65%);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-dim);
+}
+
+@layer components {
+  .surface {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+  }
+
+  .surface-hover {
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+  }
+  .surface-hover:hover {
+    background: var(--panel-hover);
+    border-color: var(--border-strong);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    border: 1px solid var(--border-strong);
+    background: var(--bg-elevated);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .chip-accent {
+    border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+    background: var(--accent-soft);
+    color: color-mix(in srgb, var(--accent) 80%, white);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.95rem;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid var(--border-strong);
+    background: var(--panel);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn:hover {
+    background: var(--panel-hover);
+    border-color: var(--accent);
+  }
+  .btn-active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: color-mix(in srgb, var(--accent) 85%, white);
+  }
+
+  .input {
+    width: 100%;
+    padding: 0.6rem 0.9rem;
+    border-radius: 10px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+  .input::placeholder {
+    color: var(--muted-dim);
+  }
+  .input:focus {
+    border-color: var(--accent);
+  }
+
+  .section-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .prose-game p {
+    margin-bottom: 0.85rem;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+  .prose-game strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+  .prose-game ul {
+    margin: 0 0 0.85rem 1.1rem;
+    list-style: disc;
+    color: var(--muted);
+  }
+  .prose-game li {
+    margin-bottom: 0.35rem;
+    line-height: 1.65;
+  }
+}
+
+.rarity-5 {
+  --rarity: var(--r-5);
+}
+.rarity-4 {
+  --rarity: var(--r-4);
+}
+.rarity-3 {
+  --rarity: var(--r-3);
+}
+
+.tier-splus {
+  --tier: var(--tier-splus);
+}
+.tier-s {
+  --tier: var(--tier-s);
+}
+.tier-a {
+  --tier: var(--tier-a);
+}
+.tier-b {
+  --tier: var(--tier-b);
+}
+.tier-c {
+  --tier: var(--tier-c);
+}
+.tier-d {
+  --tier: var(--tier-d);
+}
