@@ -63,6 +63,19 @@ Détails et diagrammes : `docs/architecture.md`. Endpoints et hypothèses :
   capturant le trafic réel (l'app officielle est fermée). Voir `docs/protocol.md`.
 * ⚠️ TTS/STT sont des stubs.
 
+## Note stratégique : pont NeoForge vs SecondBrain (Fabric)
+
+Ce pont remplace **le cerveau** de Player2NPC par Ollama, mais ne fait pas
+(encore) exécuter d'actions par le NPC — la boucle « LLM → actions » est
+du domaine de l'app Player2 fermée. **SecondBrain** (mod Fabric) intègre en
+natif un vrai moteur d'actions (**AltoClef + Baritone + Carpet**) : ses NPCs
+*agissent* réellement, avec Ollama sans bridge.
+
+➡️ Pour un compagnon qui **joue** en local, SecondBrain est plus simple et
+moins risqué. Le pont NeoForge garde de la valeur **uniquement** si tu tiens
+à conserver Player2NPC/PlayerEngine sur NeoForge. Analyse détaillée et plan
+de test : **`docs/comparison.md`**.
+
 ## Crédits / sources
 
 * client de référence Player2 : `elefant-ai/chatclef`
