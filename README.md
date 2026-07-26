@@ -25,12 +25,53 @@ Les données de jeu sont déjà versionnées dans `src/data/generated/`, le site
 | Commande | Description |
 | --- | --- |
 | `npm run dev` | Serveur de développement |
-| `npm run build` | Build de production (949 pages statiques) |
-| `npm run start` | Sert le build de production |
+| `npm run build` | Build de production : export statique dans `out/` (947 pages) |
+| `npm run search-index` | Régénère `public/search-index.json` (inclus dans le build) |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | Vérification TypeScript |
 | `npm run sync` | Régénère toutes les données de jeu |
 | `npm run sync -- hsr zzz` | Régénère uniquement les jeux indiqués |
+
+---
+
+## Déploiement sur GitHub Pages
+
+Le site est exporté en HTML statique (`output: "export"`), il s'héberge donc directement sur GitHub Pages.
+
+Le workflow prêt à l'emploi est dans **`deploy/github-pages.yml`**. Il doit être déplacé vers `.github/workflows/` — voir **[`deploy/README.md`](deploy/README.md)** pour la marche à suivre complète (3 étapes).
+
+En résumé :
+
+```bash
+mkdir -p .github/workflows
+git mv deploy/github-pages.yml .github/workflows/deploy.yml
+git commit -m "ci: workflow de déploiement GitHub Pages" && git push
+```
+
+Puis dans les réglages du dépôt : le rendre **public** (Pages sur dépôt privé exige GitHub Pro), et `Settings` → `Pages` → `Source` : **GitHub Actions**.
+
+Le site sera publié sur `https://<utilisateur>.github.io/<dépôt>/`.
+
+### Le `basePath`
+
+Une *Project Page* est servie dans un sous-dossier (`/ai-npc/`), ce que Next doit connaître à la compilation. Le workflow récupère cette valeur automatiquement via `actions/configure-pages` et la passe en `NEXT_PUBLIC_BASE_PATH` — aucun réglage manuel n'est nécessaire.
+
+Pour reproduire un build de production en local :
+
+```bash
+NEXT_PUBLIC_BASE_PATH=/ai-npc npm run build
+npx serve out          # ou : python3 -m http.server --directory out
+```
+
+En développement (`npm run dev`), la variable est vide et le site est servi à la racine.
+
+### Domaine personnalisé
+
+Placer un fichier `public/CNAME` contenant le domaine, puis vider `NEXT_PUBLIC_BASE_PATH` dans le workflow (le site est alors servi à la racine).
+
+### Alternatives sans rendre le dépôt public
+
+L'export statique dans `out/` fonctionne tel quel sur **Vercel**, **Netlify** ou **Cloudflare Pages**, qui acceptent tous les dépôts privés sur leur offre gratuite. Sur Vercel, il n'y a même pas besoin de `basePath` : laisser la variable vide.
 
 ---
 
@@ -44,6 +85,8 @@ Les données de jeu sont déjà versionnées dans `src/data/generated/`, le site
 
 Plus 6 tier lists (Memory of Chaos, Pure Fiction, Abîme Spiralé, Théâtre Imaginarium, Shiyu Defense, Deadly Assault), 6 guides de personnage détaillés et 5 articles d'actualité.
 
+Soit 947 pages HTML pré-rendues, sans serveur ni base de données.
+
 ---
 
 ## Architecture
@@ -54,6 +97,7 @@ scripts/                 Pipeline de synchronisation des données
   sync-genshin.mjs       Genshin Impact  → paquet npm genshin-db
   sync-hsr.mjs           Honkai: Star Rail → Mar-7th/StarRailRes
   sync-zzz.mjs           Zenless Zone Zero → Hakushin (miroir Genshin-Optimizer)
+  build-search-index.mjs Génère public/search-index.json (chargé à la demande)
   lib/                   Client GitHub, utilitaires (slugs, nettoyage de texte)
 
 src/
@@ -81,11 +125,12 @@ src/
 
 ### Choix techniques
 
-- **Next.js 16 (App Router) + TypeScript + Tailwind v4.** Tout est pré-rendu statiquement (`generateStaticParams`), le site est donc déployable sur n'importe quel hébergeur statique et excellent en SEO.
+- **Next.js 16 (App Router) + TypeScript + Tailwind v4.** Tout est pré-rendu statiquement (`generateStaticParams` + `output: "export"`), le site est donc déployable sur n'importe quel hébergeur de fichiers et excellent en SEO.
 - **Données découplées du contenu.** `src/data/generated/` est régénérable à volonté ; `src/content/` contient uniquement l'éditorial écrit à la main. Une mise à jour de patch ne détruit jamais les tier lists.
 - **Une seule structure normalisée** (`CharacterCard`) permet aux grilles, filtres, tier lists et à la recherche de fonctionner à l'identique pour les trois jeux, malgré des modèles de données très différents.
 - **Thème par jeu** via variables CSS (`--accent`), appliqué par le layout de segment.
-- **Images non optimisées par Next** : elles proviennent de CDN communautaires, on les sert directement via `<img loading="lazy">`.
+- **Images non optimisées par Next** : elles proviennent de CDN communautaires, on les sert directement via `<img loading="lazy">` (l'optimiseur est de toute façon indisponible en export statique).
+- **Index de recherche chargé à la demande.** Servi comme fichier statique (166 Ko) téléchargé à la première ouverture de la recherche, plutôt qu'intégré au payload de chaque page — ce qui faisait passer l'export de 781 Mo à 162 Mo.
 
 ---
 

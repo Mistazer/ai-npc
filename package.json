@@ -4,11 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/build-search-index.mjs && next build",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "sync": "NODE_EXTRA_CA_CERTS=${NODE_EXTRA_CA_CERTS:-/etc/ssl/certs/ca-certificates.crt} node scripts/sync-all.mjs"
+    "sync": "NODE_EXTRA_CA_CERTS=${NODE_EXTRA_CA_CERTS:-/etc/ssl/certs/ca-certificates.crt} node scripts/sync-all.mjs",
+    "search-index": "node scripts/build-search-index.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

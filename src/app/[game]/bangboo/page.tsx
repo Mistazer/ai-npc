@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { EntityIcon } from "@/components/EntityIcon";
 import { getGame } from "@/lib/games";
 import { zzzBangboos } from "@/lib/data";
+
+/** Route propre à ZZZ : on ne génère pas la page pour les deux autres jeux. */
+export function generateStaticParams() {
+  return [{ game: "zenless-zone-zero" }];
+}
 
 export const metadata: Metadata = {
   title: "Bangboo — Zenless Zone Zero",
@@ -12,8 +17,7 @@ export const metadata: Metadata = {
 export default async function BangbooPage({ params }: { params: Promise<{ game: string }> }) {
   const { game: slug } = await params;
   const game = getGame(slug);
-  if (!game) notFound();
-  if (game.id !== "zzz") redirect(`/${game.slug}`);
+  if (!game || game.id !== "zzz") notFound();
 
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-6">

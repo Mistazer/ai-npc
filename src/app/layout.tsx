@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { SearchProvider } from "@/components/SearchProvider";
-import { buildSearchIndex } from "@/lib/search";
 import { GAME_LIST } from "@/lib/games";
 import { meta } from "@/lib/data";
 import "./globals.css";
@@ -32,7 +31,6 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const index = buildSearchIndex();
   const syncedAt = new Date(meta.syncedAt).toLocaleDateString("fr-FR", {
     day: "numeric",
     month: "long",
@@ -42,7 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr">
       <body>
-        <SearchProvider index={index}>
+        <SearchProvider>
           <div className="relative z-10 flex min-h-screen flex-col">
             <Header />
             <main className="flex-1">{children}</main>
