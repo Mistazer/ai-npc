@@ -12,5 +12,11 @@ player2-local/data/
 # Local config overrides
 player2-local/config.toml
 
+# Uploaded skins (binaries) — keep the folder, ignore pngs
+personality-studio/skins/*.png
+
+# Python caches
+__pycache__/
+
 # OS
 .DS_Store

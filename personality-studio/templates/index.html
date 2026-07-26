@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Personality Studio — SecondBrain</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; background: #0f1115; color: #e6e6e6; }
+    header { padding: 16px 24px; background: #161a21; border-bottom: 1px solid #2a2f3a; }
+    h1 { margin: 0; font-size: 20px; }
+    main { max-width: 1000px; margin: 0 auto; padding: 24px; display: grid; gap: 24px; grid-template-columns: 1fr 1fr; }
+    .card { background: #161a21; border: 1px solid #2a2f3a; border-radius: 10px; padding: 16px; }
+    label { display: block; font-size: 12px; color: #9aa4b2; margin: 8px 0 4px; }
+    input, textarea, select { width: 100%; box-sizing: border-box; background: #0f1115; color: #e6e6e6; border: 1px solid #2a2f3a; border-radius: 6px; padding: 8px; font: inherit; }
+    textarea { min-height: 120px; resize: vertical; }
+    button { cursor: pointer; border: 0; border-radius: 6px; padding: 8px 14px; font: inherit; background: #4f7cff; color: #fff; }
+    button.sec { background: #2a2f3a; color: #e6e6e6; }
+    button.danger { background: #b3344a; }
+    .row { display: flex; gap: 8px; align-items: center; }
+    .list { display: flex; flex-direction: column; gap: 10px; }
+    .pc { border: 1px solid #2a2f3a; border-radius: 8px; padding: 12px; }
+    .pc h3 { margin: 0 0 4px; font-size: 15px; }
+    .pc small { color: #9aa4b2; }
+    .pill { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 999px; background: #1f2733; color: #9aa4b2; margin-left: 6px; }
+    code { background: #0f1115; padding: 2px 6px; border-radius: 4px; }
+    .full { grid-column: 1 / -1; }
+    pre { white-space: pre-wrap; background: #0f1115; padding: 12px; border-radius: 6px; font-size: 12px; max-height: 220px; overflow: auto; }
+    a { color: #4f7cff; }
+  </style>
+</head>
+<body>
+  <header><h1>🧠 Personality Studio <small style="color:#9aa4b2">— SecondBrain (Fabric)</small></h1></header>
+  <main>
+    <section class="card">
+      <h2>Personnalités</h2>
+      <div id="list" class="list"></div>
+    </section>
+
+    <section class="card">
+      <h2>Créer / éditer</h2>
+      <div class="row"><input id="name" placeholder="Nom (ex. Mineur)" /></div>
+      <label>Prompt de personnalité (« Characteristics » dans SecondBrain)</label>
+      <textarea id="prompt" placeholder="Tu es un mineur aguerri dans Minecraft…"></textarea>
+      <label>Skin</label>
+      <div class="row">
+        <select id="model">
+          <option value="steve">steve (classique)</option>
+          <option value="alex">alex (slim)</option>
+        </select>
+        <input id="mojang" placeholder="compte Mojang (skin par nom)" />
+        <input id="png" type="file" accept=".png" />
+        <button class="sec" id="upload">Upload .png</button>
+      </div>
+      <label>Ollama</label>
+      <div class="row">
+        <input id="modelname" placeholder="llama3.2" value="llama3.2" />
+        <input id="url" placeholder="http://localhost:11434" value="http://localhost:11434" />
+        <label style="margin:0"><input type="checkbox" id="tts" /> TTS</label>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button id="save">Enregistrer</button>
+        <button class="sec" id="reset">Nouveau</button>
+      </div>
+      <p style="font-size:12px;color:#9aa4b2">Le skin natif (.png + steve/alex) nécessite une petite fourche de SecondBrain — voir <code>FORK.md</code>. Sans fourche, utilise « compte Mojang » pour choisir le skin par le nom.</p>
+    </section>
+  </main>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    let editing = null;
+
+    async function load() {
+      const res = await fetch('/api/personalties');
+      const list = await res.json();
+      const el = $('list'); el.innerHTML = '';
+      list.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'pc';
+        const skin = p.skin || {};
+        div.innerHTML = `<h3>${p.name}<span class="pill">${p.llm?.model||''}</span><span class="pill">${skin.model||''}</span></h3>
+          <small>${p.id}</small>
+          <div class="row" style="margin-top:8px">
+            <button class="sec" onclick="edit('${p.id}')">Éditer</button>
+            <button class="sec" onclick="apply('${p.id}')">Appliquer</button>
+            <button class="danger" onclick="del('${p.id}')">Supprimer</button>
+          </div>`;
+        el.appendChild(div);
+      });
+    }
+
+    async function edit(id) {
+      const res = await fetch('/api/personalties');
+      const list = await res.json();
+      const p = list.find(x => x.id === id);
+      if (!p) return;
+      editing = id;
+      $('name').value = p.name;
+      $('prompt').value = p.prompt || '';
+      const skin = p.skin || {};
+      $('model').value = skin.model || 'steve';
+      $('mojang').value = skin.mojang_name || '';
+      $('modelname').value = (p.llm && p.llm.model) || 'llama3.2';
+      $('url').value = (p.llm && p.llm.url) || 'http://localhost:11434';
+      $('tts').checked = !!p.tts;
+    }
+
+    async function save() {
+      const payload = {
+        name: $('name').value,
+        prompt: $('prompt').value,
+        skin: { model: $('model').value, mojang_name: $('mojang').value, png: "" },
+        llm: { type: 'ollama', model: $('modelname').value, url: $('url').value },
+        tts: $('tts').checked
+      };
+      const method = editing ? 'PUT' : 'POST';
+      const url = editing ? `/api/personalties/${editing}` : '/api/personalties';
+      await fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      editing = null; $('name').value=''; $('prompt').value='';
+      load();
+    }
+
+    async function del(id) {
+      if (!confirm('Supprimer ' + id + ' ?')) return;
+      await fetch('/api/personalties/' + id, { method: 'DELETE' });
+      load();
+    }
+
+    async function apply(id) {
+      const res = await fetch('/api/personalties/' + id + '/apply');
+      const a = await res.json();
+      alert("Colle dans SecondBrain (/secondbrain → Edit) :\n\n" +
+        "Name of the NPC : " + a.npc_name + "\n" +
+        "Characteristics :\n" + a.characteristics + "\n" +
+        "Type : " + a.llm_type + " | Model : " + a.model + " | URL : " + a.url + "\n" +
+        "TTS : " + a.tts + "\n" + a.skin_note);
+    }
+
+    async function upload() {
+      if (!editing) { alert('Enregistre d\'abord la personnalité.'); return; }
+      const f = $('png').files[0]; if (!f) return;
+      const fd = new FormData(); fd.append('file', f);
+      await fetch('/api/personalties/' + editing + '/skin', { method: 'POST', body: fd });
+      load();
+    }
+
+    $('save').onclick = save;
+    $('reset').onclick = () => { editing=null; $('name').value=''; $('prompt').value=''; };
+    $('upload').onclick = upload;
+    load();
+  </script>
+</body>
+</html>
