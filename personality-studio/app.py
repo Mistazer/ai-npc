@@ -86,7 +86,7 @@ def create_personality():
         "name": body.get("name", pid),
         "prompt": body.get("prompt", ""),
         "skin": body.get("skin", {"png": "", "model": "steve", "mojang_name": ""}),
-        "llm": body.get("llm", {"type": "ollama", "model": "llama3.2", "url": "http://localhost:11434"}),
+        "llm": body.get("llm", {"type": "ollama", "model": "gemma4:12b", "url": "http://localhost:11434"}),
         "tts": bool(body.get("tts", False)),
     }
     data["personalities"].append(p)
@@ -153,7 +153,7 @@ def apply_card(pid: str):
             "npc_name": name,
             "characteristics": p["prompt"],
             "llm_type": p.get("llm", {}).get("type", "ollama"),
-            "model": p.get("llm", {}).get("model", "llama3.2"),
+            "model": p.get("llm", {}).get("model", "gemma4:12b"),
             "url": p.get("llm", {}).get("url", "http://localhost:11434"),
             "tts": p.get("tts", False),
             "skin_note": (

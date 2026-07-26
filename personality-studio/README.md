@@ -28,7 +28,7 @@ Explorateur) et tu peux en créer/éditer/supprimer de nouvelles.
 | `name` | « Name of the NPC » |
 | `prompt` | « Characteristics » (le `llmCharacter`) |
 | `llm.type = ollama` | « Type » = `OLLAMA` |
-| `llm.model` | « Model » (ex. `llama3.2`) |
+| `llm.model` | « Model » (ex. `gemma4:12b`) |
 | `llm.url` | « URL » (ex. `http://localhost:11434`) |
 | `tts` | « Text to Speech » |
 
@@ -57,7 +57,7 @@ donc skin du compte Minecraft portant ce nom). Deux options :
 3. **Ollama** :
    ```bash
    ollama serve
-   ollama pull llama3.2          # ou qwen3:14b, gemma3:12b…
+   ollama pull gemma4:12b          # ou qwen3:14b, gemma3:12b…
    ```
 4. **En jeu** : `/secondbrain` → **spawn** un NPC → **Edit** → colle
    le `prompt` (Characteristics), mets **Type = OLLAMA**, le **Model** et

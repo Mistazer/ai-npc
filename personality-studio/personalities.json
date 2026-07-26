@@ -11,7 +11,7 @@
       },
       "llm": {
         "type": "ollama",
-        "model": "llama3.2",
+        "model": "gemma4:12b",
         "url": "http://localhost:11434"
       },
       "tts": false
@@ -27,7 +27,7 @@
       },
       "llm": {
         "type": "ollama",
-        "model": "llama3.2",
+        "model": "gemma4:12b",
         "url": "http://localhost:11434"
       },
       "tts": false
@@ -43,7 +43,7 @@
       },
       "llm": {
         "type": "ollama",
-        "model": "llama3.2",
+        "model": "gemma4:12b",
         "url": "http://localhost:11434"
       },
       "tts": false
@@ -59,7 +59,7 @@
       },
       "llm": {
         "type": "ollama",
-        "model": "llama3.2",
+        "model": "gemma4:12b",
         "url": "http://localhost:11434"
       },
       "tts": false
@@ -75,7 +75,7 @@
       },
       "llm": {
         "type": "ollama",
-        "model": "llama3.2",
+        "model": "gemma4:12b",
         "url": "http://localhost:11434"
       },
       "tts": false
@@ -91,7 +91,7 @@
       },
       "llm": {
         "type": "ollama",
-        "model": "llama3.2",
+        "model": "gemma4:12b",
         "url": "http://localhost:11434"
       },
       "tts": false

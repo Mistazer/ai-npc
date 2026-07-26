@@ -53,7 +53,7 @@
       </div>
       <label>Ollama</label>
       <div class="row">
-        <input id="modelname" placeholder="llama3.2" value="llama3.2" />
+        <input id="modelname" placeholder="gemma4:12b" value="gemma4:12b" />
         <input id="url" placeholder="http://localhost:11434" value="http://localhost:11434" />
         <label style="margin:0"><input type="checkbox" id="tts" /> TTS</label>
       </div>
@@ -99,7 +99,7 @@
       const skin = p.skin || {};
       $('model').value = skin.model || 'steve';
       $('mojang').value = skin.mojang_name || '';
-      $('modelname').value = (p.llm && p.llm.model) || 'llama3.2';
+      $('modelname').value = (p.llm && p.llm.model) || 'gemma4:12b';
       $('url').value = (p.llm && p.llm.url) || 'http://localhost:11434';
       $('tts').checked = !!p.tts;
     }
