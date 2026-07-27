@@ -1,35 +1,9 @@
 {
-  "name": "hoyodex",
+  "name": "ai-npc-fabric-build",
   "version": "0.1.0",
   "private": true,
+  "description": "CI helper to build the AI NPC Fabric mod jar from the existing GitHub Pages workflow.",
   "scripts": {
-    "dev": "next dev",
-    "build": "node scripts/build-search-index.mjs && node scripts/check-content.mjs && next build",
-    "start": "next start",
-    "lint": "eslint",
-    "typecheck": "tsc --noEmit",
-    "sync": "NODE_EXTRA_CA_CERTS=${NODE_EXTRA_CA_CERTS:-/etc/ssl/certs/ca-certificates.crt} node scripts/sync-all.mjs",
-    "search-index": "node scripts/build-search-index.mjs",
-    "check-content": "node scripts/check-content.mjs"
-  },
-  "dependencies": {
-    "clsx": "^2.1.1",
-    "fuse.js": "^7.5.0",
-    "genshin-db": "^5.2.12",
-    "gray-matter": "^4.0.3",
-    "marked": "^18.0.7",
-    "next": "16.2.12",
-    "react": "19.2.4",
-    "react-dom": "19.2.4"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.12",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "build": "node scripts/ci-build.mjs"
   }
 }

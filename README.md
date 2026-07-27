@@ -1,192 +1,176 @@
-# HoyoDex
+# AI NPC — Mod Minecraft Fabric 1.20.1
 
-Base de données **et** tier lists pour les trois jeux HoYoverse : **Honkai: Star Rail**, **Genshin Impact** et **Zenless Zone Zero**.
+AI NPC est un mod **Fabric 1.20.1** qui ajoute des PNJ IA autonomes dans Minecraft. Les PNJ peuvent apparaître dans le monde, se déplacer seuls, suivre un joueur, attendre à un endroit et discuter via une interface de chat en jeu.
 
-Le site combine deux approches :
+Le projet s'inspire de mods comme **Player2NPC** et **Verity JE**, mais l'implémentation actuelle est un MVP autonome : aucune clé API externe n'est nécessaire.
 
-- l'exhaustivité d'une base de données (personnages, armes, sets, statistiques, compétences complètes) ;
-- des tier lists commentées et des guides de build éditoriaux, par mode de fin de jeu.
+## Fonctionnalités
 
-Interface entièrement en français.
+- Entité personnalisée persistante `PNJ IA` avec texture, nom visible et sons de villageois.
+- Œuf d'apparition dans l'onglet des œufs de créatures.
+- Comportements autonomes : exploration, attente, suivi du joueur, retour près d'une zone mémorisée, fuite en cas de danger.
+- Personnalités persistantes : `amical`, `curieux`, `gardien`, `marchand`, `voyageur`.
+- Mémoire simple persistée en NBT : humeur, confiance, dernier interlocuteur, activité actuelle.
+- Interface de discussion accessible par clic droit.
+- Réponses contextuelles et ordres en langage naturel :
+  - `suis-moi`
+  - `attends ici`
+  - `explore`
+  - `cette zone est notre maison`
+  - `comment vas-tu ?`
+- Commande admin pour ajouter une IA précisément.
 
----
+## Prérequis
 
-## Démarrage rapide
+- Minecraft Java **1.20.1**
+- Fabric Loader **0.15+**
+- Fabric API **0.92.2+1.20.1**
+- Java/JDK **17**
 
-```bash
-npm install
-npm run dev     # http://localhost:3000
-```
+Le wrapper Gradle est inclus (`gradlew` / `gradlew.bat`) : tu n'as pas besoin d'installer Gradle séparément.
 
-Les données de jeu sont déjà versionnées dans `src/data/generated/`, le site fonctionne donc immédiatement après `npm install`, sans accès réseau.
+## Build
 
-### Autres commandes
-
-| Commande | Description |
-| --- | --- |
-| `npm run dev` | Serveur de développement |
-| `npm run build` | Build de production : export statique dans `out/` (947 pages) |
-| `npm run search-index` | Régénère `public/search-index.json` (inclus dans le build) |
-| `npm run lint` | ESLint |
-| `npm run typecheck` | Vérification TypeScript |
-| `npm run sync` | Régénère toutes les données de jeu |
-| `npm run sync -- hsr zzz` | Régénère uniquement les jeux indiqués |
-| `npm run check-content` | Vérifie que l'éditorial référence des slugs existants |
-
----
-
-## Déploiement sur GitHub Pages
-
-Le site est exporté en HTML statique (`output: "export"`), il s'héberge donc directement sur GitHub Pages.
-
-Le workflow prêt à l'emploi est dans **`deploy/github-pages.yml`**. Il doit être déplacé vers `.github/workflows/` — voir **[`deploy/README.md`](deploy/README.md)** pour la marche à suivre complète (3 étapes).
-
-En résumé :
+### Linux / macOS
 
 ```bash
-mkdir -p .github/workflows
-git mv deploy/github-pages.yml .github/workflows/deploy.yml
-git commit -m "ci: workflow de déploiement GitHub Pages" && git push
+java -version   # doit afficher 17
+./gradlew build
 ```
 
-Puis dans les réglages du dépôt : le rendre **public** (Pages sur dépôt privé exige GitHub Pro), et `Settings` → `Pages` → `Source` : **GitHub Actions**.
+### Windows PowerShell
 
-> Si le workflow échoue avec `Get Pages site failed / Not Found`, c'est qu'il s'est lancé avant l'activation de Pages : activer Pages puis relancer le job depuis l'onglet `Actions`. Voir [`deploy/README.md`](deploy/README.md#erreurs-courantes-au-premier-lancement).
+Le plus simple est d'utiliser le script fourni, qui cherche automatiquement un JDK 17 installé puis lance Gradle avec ce Java :
 
-Le site sera publié sur `https://<utilisateur>.github.io/<dépôt>/`.
+```powershell
+.\build-java17.bat
+```
 
-### Le `basePath`
+Sinon, en manuel :
 
-Une *Project Page* est servie dans un sous-dossier (`/ai-npc/`), ce que Next doit connaître à la compilation. Le workflow récupère cette valeur automatiquement via `actions/configure-pages` et la passe en `NEXT_PUBLIC_BASE_PATH` — aucun réglage manuel n'est nécessaire.
+```powershell
+java -version   # doit afficher 17
+.\gradlew.bat --stop
+.\gradlew.bat build
+```
 
-Pour reproduire un build de production en local :
+Le fichier `.jar` sera généré dans :
+
+```text
+build/libs/ai-npc-0.1.0.jar
+```
+
+### Si ton terminal utilise encore Java 11
+
+Fabric 1.20.1 a besoin de Java 17. Installe un JDK 17 puis pointe `JAVA_HOME` dessus avant de lancer le build.
+
+Windows PowerShell, exemple avec Eclipse Temurin :
+
+```powershell
+winget install EclipseAdoptium.Temurin.17.JDK
+.\build-java17.bat
+```
+
+Ou en définissant Java à la main :
+
+```powershell
+$env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-17.0.x.x-hotspot"
+$env:Path = "$env:JAVA_HOME\bin;$env:Path"
+java -version
+.\gradlew.bat --stop
+.\gradlew.bat build
+```
+
+Linux, exemple Debian/Ubuntu :
 
 ```bash
-NEXT_PUBLIC_BASE_PATH=/ai-npc npm run build
-npx serve out          # ou : python3 -m http.server --directory out
+sudo apt install openjdk-17-jdk
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+export PATH="$JAVA_HOME/bin:$PATH"
+java -version
+./gradlew build
 ```
 
-En développement (`npm run dev`), la variable est vide et le site est servi à la racine.
+macOS, exemple Homebrew :
 
-### Domaine personnalisé
+```bash
+brew install openjdk@17
+export JAVA_HOME=$(/usr/libexec/java_home -v 17)
+export PATH="$JAVA_HOME/bin:$PATH"
+java -version
+./gradlew build
+```
 
-Placer un fichier `public/CNAME` contenant le domaine, puis vider `NEXT_PUBLIC_BASE_PATH` dans le workflow (le site est alors servi à la racine).
+> Dans cet environnement Arena, le réseau système vers Maven/Fabric est bloqué, donc le build complet n'a pas pu être exécuté ici. Le projet est configuré comme un projet Fabric Loom standard et le wrapper Gradle est fourni.
 
-### Alternatives sans rendre le dépôt public
+## Installation
 
-L'export statique dans `out/` fonctionne tel quel sur **Vercel**, **Netlify** ou **Cloudflare Pages**, qui acceptent tous les dépôts privés sur leur offre gratuite. Sur Vercel, il n'y a même pas besoin de `basePath` : laisser la variable vide.
+1. Compile le mod avec `gradle build`.
+2. Installe Fabric Loader 1.20.1.
+3. Place dans ton dossier `mods/` :
+   - `ai-npc-0.1.0.jar`
+   - `fabric-api-0.92.2+1.20.1.jar`
+4. Lance Minecraft.
 
----
+## Utilisation en jeu
 
-## Contenu actuel
+### Ajouter une IA
 
-| Jeu | Personnages | Armes | Sets | Autre |
-| --- | --- | --- | --- | --- |
-| Honkai: Star Rail | 95 | 165 cônes de lumière | 60 reliques | — |
-| Genshin Impact | 120 | 237 armes | 61 artéfacts | — |
-| Zenless Zone Zero | 56 agents | 93 W-Engines | 28 disques driver | 40 Bangboo |
+- En créatif : utilise l'item **Œuf d'apparition de PNJ IA**.
+- En commande :
 
-Plus **8 tier lists** couvrant tous les modes de fin de jeu, un **onglet bêta** suivant 24 personnages à venir, 7 guides de personnage détaillés et 6 articles.
+```mcfunction
+/ainpc spawn
+/ainpc spawn amical Luna
+/ainpc spawn gardien Atlas
+/ainpc personnalites
+```
 
-| Jeu | Tier lists |
-| --- | --- |
-| Honkai: Star Rail | Memory of Chaos, Pure Fiction, Apocalyptic Shadow |
-| Genshin Impact | Abîme Spiralé, Théâtre Imaginarium, Onirique Stygien |
-| Zenless Zone Zero | Shiyu Defense, Deadly Assault |
+### Discuter
 
-Les classements utilisent la notation **T0 → T3** et sont répartis en **colonnes par rôle** (DPS, sous-DPS, support, sustain), à la manière de Prydwen : on compare les personnages à l'intérieur d'une colonne, pas entre colonnes.
+Fais un clic droit sur un PNJ IA. Une interface de discussion s'ouvre.
 
-Soit 947 pages HTML pré-rendues, sans serveur ni base de données.
+Exemples de messages :
 
----
+```text
+Salut
+Suis-moi
+Attends ici
+Explore
+Cette zone est notre maison
+Comment vas-tu ?
+Qui es-tu ?
+Aide
+```
 
 ## Architecture
 
-```
-scripts/                 Pipeline de synchronisation des données
-  sync-all.mjs           Orchestrateur (npm run sync)
-  sync-genshin.mjs       Genshin Impact  → paquet npm genshin-db
-  sync-hsr.mjs           Honkai: Star Rail → Mar-7th/StarRailRes
-  sync-zzz.mjs           Zenless Zone Zero → Hakushin (miroir Genshin-Optimizer)
-  build-search-index.mjs Génère public/search-index.json (chargé à la demande)
-  lib/                   Client GitHub, utilitaires (slugs, nettoyage de texte)
-
-src/
-  data/generated/        JSON produits par les scripts (versionnés, ~2,9 Mo)
-  lib/
-    games.ts             Configuration des 3 jeux (couleurs, libellés, modes)
-    types.ts             Types TypeScript partagés
-    data.ts              Accès aux données + normalisation multi-jeux
-    search.ts            Index de recherche global
-  content/               Contenu éditorial, écrit à la main
-    tierlists.ts         Tier lists (T0→T3, colonnes par rôle) et commentaires
-    guides.ts            Guides de build (plusieurs builds par personnage)
-    beta.ts              Personnages annoncés / en test
-    news.ts              Articles
-  components/            Composants UI (grilles, filtres, tier lists, recherche)
-  app/
-    page.tsx                        Accueil multi-jeux
-    [game]/                         Hub par jeu (routes en français)
-      personnages/[slug]            Fiches détaillées
-      armes/[slug]                  Armes / cônes / W-Engines
-      sets/[slug]                   Artéfacts / reliques / disques
-      bangboo                       Spécifique à ZZZ
-      tier-list/[mode]              Tier lists filtrables
-      beta                          Contenu bêta du jeu
-    beta                            Contenu bêta des trois jeux
-    actualites/[slug]               Articles
+```text
+src/main/java/fr/mistazer/ainpc/
+  AiNpcMod.java                  Entrypoint serveur/commun
+  client/
+    AiNpcClient.java             Entrypoint client
+    gui/AiNpcChatScreen.java     Interface de chat
+    render/AiNpcRenderer.java    Rendu du PNJ
+  command/AiNpcCommands.java     Commandes /ainpc
+  dialogue/AiNpcDialogue.java    Moteur de réponses contextuelles
+  entity/
+    AiNpcEntity.java             Entité IA
+    AiNpcActivity.java           États autonomes
+    AiNpcPersonality.java        Personnalités
+    goal/                        Goals IA Minecraft
+  network/AiNpcNetworking.java   Paquets client/serveur
+  registry/                      Enregistrement entité + item
 ```
 
-### Choix techniques
+## Prochaines améliorations possibles
 
-- **Next.js 16 (App Router) + TypeScript + Tailwind v4.** Tout est pré-rendu statiquement (`generateStaticParams` + `output: "export"`), le site est donc déployable sur n'importe quel hébergeur de fichiers et excellent en SEO.
-- **Données découplées du contenu.** `src/data/generated/` est régénérable à volonté ; `src/content/` contient uniquement l'éditorial écrit à la main. Une mise à jour de patch ne détruit jamais les tier lists.
-- **Une seule structure normalisée** (`CharacterCard`) permet aux grilles, filtres, tier lists et à la recherche de fonctionner à l'identique pour les trois jeux, malgré des modèles de données très différents.
-- **Thème par jeu** via variables CSS (`--accent`), appliqué par le layout de segment.
-- **Images non optimisées par Next** : elles proviennent de CDN communautaires, on les sert directement via `<img loading="lazy">` (l'optimiseur est de toute façon indisponible en export statique).
-- **Index de recherche chargé à la demande.** Servi comme fichier statique (166 Ko) téléchargé à la première ouverture de la recherche, plutôt qu'intégré au payload de chaque page — ce qui faisait passer l'export de 781 Mo à 162 Mo.
+- Ajouter un vrai connecteur LLM optionnel (Ollama local, OpenAI-compatible, LM Studio, etc.).
+- Ajouter des skins configurables par personnalité.
+- Sauvegarder un historique de conversation plus long.
+- Donner des tâches plus avancées aux PNJ : récolte, garde de zone, retour à la base, patrouille.
+- Ajouter un écran d'administration pour créer/modifier les IA sans commande.
 
----
+## Licence
 
-## Ajouter du contenu
-
-**Une tier list** — ajouter une entrée dans `src/content/tierlists.ts` et déclarer le mode dans `tierModes` du jeu concerné (`src/lib/games.ts`). Les `slug` doivent correspondre à ceux de `src/data/generated/*-characters.json` ; une entrée inconnue est ignorée à l'affichage.
-
-**Un guide** — ajouter un objet dans `src/content/guides.ts` avec le `game` et le `slug` du personnage. Il apparaît automatiquement sur sa fiche et sur les pages d'accueil.
-
-**Un article** — ajouter une entrée dans `src/content/news.ts` (le corps accepte du Markdown).
-
----
-
-## Sources des données
-
-### Données de jeu (générées)
-
-| Jeu | Source | Nature |
-| --- | --- | --- |
-| Genshin Impact | [`genshin-db`](https://github.com/theBowja/genshin-db) (npm) | Données extraites du jeu, communautaire |
-| Honkai: Star Rail | [`Mar-7th/StarRailRes`](https://github.com/Mar-7th/StarRailRes) | Index JSON + assets, communautaire |
-| Zenless Zone Zero | [`Genshin-Optimizer/zzz-hakushin-data`](https://github.com/Genshin-Optimizer/zzz-hakushin-data) | Données Hakushin, communautaire |
-
-### Références éditoriales (tier lists et guides)
-
-| Jeu | Références |
-| --- | --- |
-| Honkai: Star Rail | [Prydwen](https://www.prydwen.gg/star-rail/) |
-| Genshin Impact | [La Gazette de Teyvat](https://lagazettedeteyvat.fr), [KeqingMains](https://keqingmains.com), [Stygian.moe](https://www.stygian.moe/fr) et [GenshinLab](https://genshinlab.com) pour l'endgame |
-| Zenless Zone Zero | [Prydwen](https://www.prydwen.gg/zenless/) |
-| Suivi bêta | [GachaBase](https://gachabase.net) |
-
-Chaque tier list et chaque guide affiche ses sources sur la page correspondante.
-
-### Note sur les images ZZZ
-
-Hakushin (`static.nanoka.cc`) a fermé début 2026, ce qui a cassé tous les visuels de Zenless Zone Zero. Les données stockent désormais **plusieurs URL candidates par visuel** et le composant `EntityIcon` essaie chaque source dans l'ordre avant d'afficher un remplacement textuel. Pour ajouter un CDN, modifier la constante `CDNS` dans `scripts/sync-zzz.mjs` puis relancer `npm run sync -- zzz`.
-
-Le script de synchronisation passe par l'API `api.github.com` (et non `raw.githubusercontent.com`) pour rester utilisable derrière des proxys restrictifs. Dans un environnement avec inspection TLS, définir `NODE_EXTRA_CA_CERTS` — le script `npm run sync` le fait déjà par défaut.
-
----
-
-## Avertissement
-
-HoyoDex est un projet communautaire non officiel. Honkai: Star Rail, Genshin Impact et Zenless Zone Zero sont des marques de HoYoverse / COGNOSPHERE PTE. LTD. Tous les visuels, noms et contenus de jeu restent la propriété de leurs détenteurs respectifs.
+MIT

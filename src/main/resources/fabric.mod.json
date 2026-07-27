@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "ai_npc",
+  "version": "${version}",
+  "name": "AI NPC",
+  "description": "Ajoute des PNJ IA autonomes avec une interface de discussion en jeu.",
+  "authors": [
+    "Mistazer"
+  ],
+  "contact": {
+    "homepage": "https://github.com/Mistazer/ai-npc",
+    "sources": "https://github.com/Mistazer/ai-npc"
+  },
+  "license": "MIT",
+  "icon": "assets/ai_npc/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "fr.mistazer.ainpc.AiNpcMod"
+    ],
+    "client": [
+      "fr.mistazer.ainpc.client.AiNpcClient"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "fabric-api": "*",
+    "minecraft": "~1.20.1",
+    "java": ">=17"
+  }
+}

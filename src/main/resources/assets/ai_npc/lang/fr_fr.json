@@ -1,0 +1,11 @@
+{
+  "entity.ai_npc.ai_npc": "PNJ IA",
+  "item.ai_npc.ai_npc_spawn_egg": "Œuf d'apparition de PNJ IA",
+  "command.ai_npc.spawned": "IA ajoutée : %s (%s)",
+  "command.ai_npc.personality_unknown": "Personnalité inconnue. Valeurs : %s",
+  "command.ai_npc.personalities": "Personnalités disponibles : %s",
+  "screen.ai_npc.chat.title": "Discussion avec %s",
+  "screen.ai_npc.chat.placeholder": "Écris un message...",
+  "screen.ai_npc.chat.send": "Envoyer",
+  "text.ai_npc.chat.closed_response": "%s répond : %s"
+}
