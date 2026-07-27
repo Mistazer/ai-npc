@@ -9,6 +9,7 @@ import { GAME_LIST, getGame } from "@/lib/games";
 import { getCharacter, getCharacterCard, getCharacterCards } from "@/lib/data";
 import { getGuide } from "@/content/guides";
 import { getTierListsForGame } from "@/content/tierlists";
+import { getBetaEntry } from "@/content/beta";
 import type { GiCharacter, HsrCharacter, Tier, ZzzCharacter } from "@/lib/types";
 
 export function generateStaticParams() {
@@ -52,6 +53,7 @@ export default async function CharacterPage({
   if (!card || !character) notFound();
 
   const guide = getGuide(game.id, slug);
+  const beta = getBetaEntry(game.id, slug);
 
   const tiers = getTierListsForGame(game.id)
     .map((list) => {
@@ -77,6 +79,19 @@ export default async function CharacterPage({
           { label: card.name },
         ]}
       />
+
+      {beta ? (
+        <div className="mb-4 rounded-xl border border-[rgba(255,143,77,0.4)] bg-[rgba(255,143,77,0.08)] p-3">
+          <p className="text-[0.82rem] leading-relaxed text-[var(--muted)]">
+            <strong className="text-[#ff8f4d]">Contenu {beta.status.toLowerCase()} — version {beta.version}.</strong>{" "}
+            {beta.summary} Les valeurs affichées ci-dessous proviennent des fichiers de test et
+            changeront probablement avant la sortie.{" "}
+            <Link href={`/${game.slug}/beta`} className="underline hover:text-[var(--text)]">
+              Voir tout le contenu bêta
+            </Link>
+          </p>
+        </div>
+      ) : null}
 
       <CharacterHero
         card={card}
@@ -142,6 +157,23 @@ export default async function CharacterPage({
             <InfoBlock game={game.id} character={character} />
           </Panel>
 
+          <Panel title="Sources de référence">
+            <div className="flex flex-wrap gap-1.5">
+              {game.sources.map((source) => (
+                <a
+                  key={source.url}
+                  href={source.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={source.note}
+                  className="chip transition hover:border-[var(--accent)]"
+                >
+                  {source.label} ↗
+                </a>
+              ))}
+            </div>
+          </Panel>
+
           <Panel title={`Autres ${game.labels.characters.toLowerCase()}`}>
             <div className="grid grid-cols-5 gap-1.5">
               {getCharacterCards(game.id)
@@ -154,8 +186,7 @@ export default async function CharacterPage({
                     title={entry.name}
                     className="overflow-hidden rounded-lg border border-[var(--border-strong)] transition hover:border-[var(--accent)]"
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={entry.icon ?? ""} alt={entry.name} loading="lazy" className="aspect-square w-full object-cover" />
+                    <EntityIcon src={entry.icon} alt={entry.name} size={56} rarity={entry.rarityRank} className="w-full" />
                   </Link>
                 ))}
             </div>

@@ -31,6 +31,7 @@ Les données de jeu sont déjà versionnées dans `src/data/generated/`, le site
 | `npm run typecheck` | Vérification TypeScript |
 | `npm run sync` | Régénère toutes les données de jeu |
 | `npm run sync -- hsr zzz` | Régénère uniquement les jeux indiqués |
+| `npm run check-content` | Vérifie que l'éditorial référence des slugs existants |
 
 ---
 
@@ -49,6 +50,8 @@ git commit -m "ci: workflow de déploiement GitHub Pages" && git push
 ```
 
 Puis dans les réglages du dépôt : le rendre **public** (Pages sur dépôt privé exige GitHub Pro), et `Settings` → `Pages` → `Source` : **GitHub Actions**.
+
+> Si le workflow échoue avec `Get Pages site failed / Not Found`, c'est qu'il s'est lancé avant l'activation de Pages : activer Pages puis relancer le job depuis l'onglet `Actions`. Voir [`deploy/README.md`](deploy/README.md#erreurs-courantes-au-premier-lancement).
 
 Le site sera publié sur `https://<utilisateur>.github.io/<dépôt>/`.
 
@@ -83,7 +86,15 @@ L'export statique dans `out/` fonctionne tel quel sur **Vercel**, **Netlify** ou
 | Genshin Impact | 120 | 237 armes | 61 artéfacts | — |
 | Zenless Zone Zero | 56 agents | 93 W-Engines | 28 disques driver | 40 Bangboo |
 
-Plus 6 tier lists (Memory of Chaos, Pure Fiction, Abîme Spiralé, Théâtre Imaginarium, Shiyu Defense, Deadly Assault), 6 guides de personnage détaillés et 5 articles d'actualité.
+Plus **8 tier lists** couvrant tous les modes de fin de jeu, un **onglet bêta** suivant 24 personnages à venir, 7 guides de personnage détaillés et 6 articles.
+
+| Jeu | Tier lists |
+| --- | --- |
+| Honkai: Star Rail | Memory of Chaos, Pure Fiction, Apocalyptic Shadow |
+| Genshin Impact | Abîme Spiralé, Théâtre Imaginarium, Onirique Stygien |
+| Zenless Zone Zero | Shiyu Defense, Deadly Assault |
+
+Les classements utilisent la notation **T0 → T3** et sont répartis en **colonnes par rôle** (DPS, sous-DPS, support, sustain), à la manière de Prydwen : on compare les personnages à l'intérieur d'une colonne, pas entre colonnes.
 
 Soit 947 pages HTML pré-rendues, sans serveur ni base de données.
 
@@ -108,8 +119,9 @@ src/
     data.ts              Accès aux données + normalisation multi-jeux
     search.ts            Index de recherche global
   content/               Contenu éditorial, écrit à la main
-    tierlists.ts         Tier lists et commentaires
-    guides.ts            Guides de build et compositions d'équipe
+    tierlists.ts         Tier lists (T0→T3, colonnes par rôle) et commentaires
+    guides.ts            Guides de build (plusieurs builds par personnage)
+    beta.ts              Personnages annoncés / en test
     news.ts              Articles
   components/            Composants UI (grilles, filtres, tier lists, recherche)
   app/
@@ -120,6 +132,8 @@ src/
       sets/[slug]                   Artéfacts / reliques / disques
       bangboo                       Spécifique à ZZZ
       tier-list/[mode]              Tier lists filtrables
+      beta                          Contenu bêta du jeu
+    beta                            Contenu bêta des trois jeux
     actualites/[slug]               Articles
 ```
 
@@ -146,11 +160,28 @@ src/
 
 ## Sources des données
 
-| Jeu | Source | Licence / nature |
+### Données de jeu (générées)
+
+| Jeu | Source | Nature |
 | --- | --- | --- |
 | Genshin Impact | [`genshin-db`](https://github.com/theBowja/genshin-db) (npm) | Données extraites du jeu, communautaire |
 | Honkai: Star Rail | [`Mar-7th/StarRailRes`](https://github.com/Mar-7th/StarRailRes) | Index JSON + assets, communautaire |
-| Zenless Zone Zero | [`Genshin-Optimizer/zzz-hakushin-data`](https://github.com/Genshin-Optimizer/zzz-hakushin-data) (Hakushin) | Données Hakushin, communautaire |
+| Zenless Zone Zero | [`Genshin-Optimizer/zzz-hakushin-data`](https://github.com/Genshin-Optimizer/zzz-hakushin-data) | Données Hakushin, communautaire |
+
+### Références éditoriales (tier lists et guides)
+
+| Jeu | Références |
+| --- | --- |
+| Honkai: Star Rail | [Prydwen](https://www.prydwen.gg/star-rail/) |
+| Genshin Impact | [La Gazette de Teyvat](https://lagazettedeteyvat.fr), [KeqingMains](https://keqingmains.com), [Stygian.moe](https://www.stygian.moe/fr) et [GenshinLab](https://genshinlab.com) pour l'endgame |
+| Zenless Zone Zero | [Prydwen](https://www.prydwen.gg/zenless/) |
+| Suivi bêta | [GachaBase](https://gachabase.net) |
+
+Chaque tier list et chaque guide affiche ses sources sur la page correspondante.
+
+### Note sur les images ZZZ
+
+Hakushin (`static.nanoka.cc`) a fermé début 2026, ce qui a cassé tous les visuels de Zenless Zone Zero. Les données stockent désormais **plusieurs URL candidates par visuel** et le composant `EntityIcon` essaie chaque source dans l'ordre avant d'afficher un remplacement textuel. Pour ajouter un CDN, modifier la constante `CDNS` dans `scripts/sync-zzz.mjs` puis relancer `npm run sync -- zzz`.
 
 Le script de synchronisation passe par l'API `api.github.com` (et non `raw.githubusercontent.com`) pour rester utilisable derrière des proxys restrictifs. Dans un environnement avec inspection TLS, définir `NODE_EXTRA_CA_CERTS` — le script `npm run sync` le fait déjà par défaut.
 

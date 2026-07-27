@@ -2,6 +2,26 @@ import type { NewsItem } from "@/lib/types";
 
 export const NEWS: NewsItem[] = [
   {
+    slug: "refonte-tier-lists-et-beta",
+    title: "Tier lists en colonnes, onglet bêta et nouvelles sources",
+    date: "2026-07-26",
+    game: "all",
+    category: "Site",
+    excerpt:
+      "Les tier lists passent en notation T0/T0.5 réparties par rôle, un onglet bêta suit le contenu à venir, et Apocalyptic Shadow rejoint Star Rail.",
+    body: `Grosse mise à jour du site, sur quatre points.
+
+**Tier lists réorganisées.** Les classements adoptent la notation **T0 à T3** et sont désormais répartis en colonnes par rôle — DPS, sous-DPS, amplificateur, sustain — comme sur Prydwen. Les personnages se comparent à l'intérieur d'une colonne, pas entre colonnes : un support T0 et un DPS T0 ne jouent pas le même rôle.
+
+**Apocalyptic Shadow.** Le troisième mode de fin de jeu de Honkai: Star Rail a sa tier list dédiée, avec ses propres critères : dégâts mono-cible, rupture de barre de résistance et fenêtres de burst.
+
+**Onglet bêta.** Un nouvel onglet suit les personnages annoncés ou repérés dans les fichiers de test, pour les trois jeux. Chaque entrée indique la version prévue et son statut — bêta, annoncé ou datamine. Les fiches concernées affichent un avertissement : ces données changent d'une itération de test à l'autre.
+
+**Sources par jeu.** Les guides Genshin s'appuient désormais sur **La Gazette de Teyvat** et **KeqingMains**, et les classements de fin de jeu sur **Stygian.moe** et **GenshinLab** — avec l'ajout du mode Onirique Stygien. Star Rail et Zenless Zone Zero suivent **Prydwen**. Chaque tier list et chaque guide cite ses références.
+
+Correction au passage : les visuels de Zenless Zone Zero ne s'affichaient plus depuis la fermeture d'Hakushin. Le site essaie maintenant plusieurs sources d'images successives.`,
+  },
+  {
     slug: "lancement-hoyodex",
     title: "HoyoDex ouvre ses portes",
     date: "2026-07-26",

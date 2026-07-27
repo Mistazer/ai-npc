@@ -1,4 +1,4 @@
-import type { GameId } from "./types";
+import type { GameId, ImageSource } from "./types";
 
 /**
  * Entrée de l'index de recherche global.
@@ -10,6 +10,6 @@ export interface SearchEntry {
   u: string; // url
   g: GameId; // jeu
   t: string; // type affiché
-  i: string | null; // icône
+  i: ImageSource; // icône (URL ou liste de candidates)
   r: number | string | null; // rareté
 }

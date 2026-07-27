@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { EntityIcon } from "@/components/EntityIcon";
 import { GAME_LIST } from "@/lib/games";
 import { getCharacterCards, getCounts, meta } from "@/lib/data";
 import { getTierListsForGame } from "@/content/tierlists";
@@ -97,13 +98,7 @@ export default function HomePage() {
                       title={card.name}
                       className="aspect-square overflow-hidden rounded-lg border border-[var(--border-strong)] transition hover:border-[var(--accent)]"
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={card.icon ?? ""}
-                        alt={card.name}
-                        loading="lazy"
-                        className="h-full w-full object-cover"
-                      />
+                      <EntityIcon src={card.icon} alt={card.name} size={64} rarity={card.rarityRank} className="h-full w-full" />
                     </Link>
                   ))}
                 </div>
@@ -132,13 +127,7 @@ export default function HomePage() {
                   href={`/${game.slug}/personnages/${guide.slug}`}
                   className="surface surface-hover flex gap-3 p-3"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={card.icon ?? ""}
-                    alt={card.name}
-                    loading="lazy"
-                    className="h-14 w-14 shrink-0 rounded-lg border border-[var(--border-strong)] object-cover"
-                  />
+                  <EntityIcon src={card.icon} alt={card.name} size={56} rarity={card.rarityRank} />
                   <div className="min-w-0">
                     <p className="text-[0.7rem] font-semibold" style={{ color: game.accent }}>
                       {game.shortName}

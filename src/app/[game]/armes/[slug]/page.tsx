@@ -1,8 +1,8 @@
-/* eslint-disable @next/next/no-img-element */
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Breadcrumbs, GameText, Panel, StatGrid } from "@/components/ui";
 import { EntityIcon } from "@/components/EntityIcon";
+import { Illustration } from "@/components/Illustration";
 import { GAME_LIST, getGame } from "@/lib/games";
 import { getWeapon, getWeapons } from "@/lib/data";
 import type { GiWeapon, HsrLightCone, ZzzWeapon } from "@/lib/types";
@@ -145,7 +145,7 @@ export default async function WeaponPage({
 
           {weapon.images.splash ? (
             <Panel title="Illustration">
-              <img src={weapon.images.splash} alt={weapon.name} loading="lazy" className="w-full rounded-lg" />
+              <Illustration src={weapon.images.splash} alt={weapon.name} />
             </Panel>
           ) : null}
         </aside>

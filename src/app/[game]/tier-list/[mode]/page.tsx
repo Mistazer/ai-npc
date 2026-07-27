@@ -62,6 +62,23 @@ export default async function TierListPage({
         Dernière mise à jour : {new Date(list.updated).toLocaleDateString("fr-FR", { dateStyle: "long" })}
       </p>
 
+      {list.sources && list.sources.length > 0 ? (
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          <span className="text-[0.72rem] text-[var(--muted-dim)]">Sources :</span>
+          {list.sources.map((source) => (
+            <a
+              key={source.url}
+              href={source.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="chip transition hover:border-[var(--accent)]"
+            >
+              {source.label} ↗
+            </a>
+          ))}
+        </div>
+      ) : null}
+
       {siblings.length > 1 ? (
         <div className="my-4 flex flex-wrap gap-2">
           {siblings.map((sibling) => (
@@ -79,11 +96,18 @@ export default async function TierListPage({
 
       <TierListView list={list} game={game} cards={cards} />
 
-      <p className="mt-6 text-[0.75rem] leading-relaxed text-[var(--muted-dim)]">
-        Méthodologie : les classements supposent un investissement raisonnable (niveau maximum, arme
-        adaptée non signature, équipement correctement optimisé) et une équipe cohérente. Un personnage
-        classé bas reste jouable — il demande simplement plus d&apos;efforts pour un résultat équivalent.
-      </p>
+      <div className="surface mt-6 p-4">
+        <p className="mb-1.5 text-[0.8rem] font-bold">Méthodologie</p>
+        <p className="text-[0.75rem] leading-relaxed text-[var(--muted-dim)]">
+          Les classements supposent un investissement raisonnable — niveau maximum, arme adaptée non
+          signature, équipement correctement optimisé — et une équipe cohérente. Les personnages sont
+          répartis par rôle : comparez-les à l&apos;intérieur d&apos;une colonne, pas entre colonnes.
+          <strong className="text-[var(--muted)]"> T0</strong> désigne le sommet du méta,{" "}
+          <strong className="text-[var(--muted)]">T3</strong> les unités en difficulté. Un personnage
+          classé bas reste jouable : il demande simplement plus d&apos;efforts pour un résultat
+          équivalent.
+        </p>
+      </div>
     </div>
   );
 }

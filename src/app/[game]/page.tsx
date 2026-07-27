@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CharacterCardTile } from "@/components/CharacterCardTile";
+import { EntityIcon } from "@/components/EntityIcon";
 import { getGame } from "@/lib/games";
 import { getCharacterCards, getCounts } from "@/lib/data";
 import { getTierListsForGame } from "@/content/tierlists";
 import { getGuidesForGame } from "@/content/guides";
 import { sortedNews } from "@/content/news";
+import { getBetaForGame } from "@/content/beta";
 
 export async function generateMetadata({
   params,
@@ -32,6 +34,7 @@ export default async function GameHome({ params }: { params: Promise<{ game: str
   const latest = cards.filter((card) => card.rarityRank >= 5).slice(0, 12);
   const tierLists = getTierListsForGame(game.id);
   const guides = getGuidesForGame(game.id);
+  const beta = getBetaForGame(game.id);
   const news = sortedNews.filter((item) => item.game === game.id || item.game === "all").slice(0, 4);
 
   return (
@@ -65,6 +68,36 @@ export default async function GameHome({ params }: { params: Promise<{ game: str
           ))}
         </div>
       </section>
+
+      {beta.length > 0 ? (
+        <section className="mb-8">
+          <div className="mb-3 flex items-baseline justify-between">
+            <h2 className="section-title">Contenu bêta</h2>
+            <Link href={`/${game.slug}/beta`} className="text-[0.78rem] text-[var(--muted-dim)] hover:text-[var(--text)]">
+              Voir les {beta.length} entrées →
+            </Link>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {beta.slice(0, 8).map((entry) => {
+              const card = cards.find((item) => item.slug === entry.slug);
+              if (!card) return null;
+              return (
+                <Link
+                  key={entry.slug}
+                  href={`/${game.slug}/personnages/${entry.slug}`}
+                  className="surface surface-hover flex items-center gap-2 p-2"
+                >
+                  <EntityIcon src={card.icon} alt={card.name} size={34} rarity={card.rarityRank} rounded="md" />
+                  <div>
+                    <p className="text-[0.78rem] font-semibold">{card.name}</p>
+                    <p className="text-[0.65rem] text-[var(--muted-dim)]">v{entry.version} · {entry.status}</p>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
 
       <section className="mb-8">
         <h2 className="section-title mb-3">Tier lists</h2>
@@ -105,6 +138,26 @@ export default async function GameHome({ params }: { params: Promise<{ game: str
         </div>
       </section>
 
+      <section className="mb-8">
+        <h2 className="section-title mb-3">Sources de référence</h2>
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          {game.sources.map((source) => (
+            <a
+              key={source.url}
+              href={source.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="surface surface-hover p-3"
+            >
+              <p className="text-[0.83rem] font-bold" style={{ color: game.accent }}>
+                {source.label} ↗
+              </p>
+              <p className="mt-0.5 text-[0.72rem] leading-snug text-[var(--muted-dim)]">{source.note}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+
       <section className="grid gap-6 lg:grid-cols-2">
         <div>
           <h2 className="section-title mb-3">Guides disponibles</h2>
@@ -122,13 +175,7 @@ export default async function GameHome({ params }: { params: Promise<{ game: str
                     href={`/${game.slug}/personnages/${guide.slug}`}
                     className="surface surface-hover flex gap-3 p-3"
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={card?.icon ?? ""}
-                      alt={card?.name ?? guide.slug}
-                      loading="lazy"
-                      className="h-12 w-12 shrink-0 rounded-lg border border-[var(--border-strong)] object-cover"
-                    />
+                    <EntityIcon src={card?.icon ?? null} alt={card?.name ?? guide.slug} size={48} rarity={card?.rarityRank} />
                     <div className="min-w-0">
                       <p className="text-sm font-bold">{card?.name ?? guide.slug}</p>
                       <p className="line-clamp-2 text-[0.75rem] leading-snug text-[var(--muted-dim)]">

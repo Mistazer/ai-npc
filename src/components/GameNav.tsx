@@ -16,6 +16,7 @@ export function GameNav({ game }: { game: GameConfig }) {
     { href: `${base}/sets`, label: game.labels.artifacts },
     ...(game.id === "zzz" ? [{ href: `${base}/bangboo`, label: "Bangboo" }] : []),
     { href: `${base}/tier-list`, label: "Tier lists" },
+    { href: `${base}/beta`, label: "Bêta", badge: true },
   ];
 
   return (
@@ -39,6 +40,14 @@ export function GameNav({ game }: { game: GameConfig }) {
               style={active ? { boxShadow: `inset 0 0 0 1px ${game.accent}` } : undefined}
             >
               {link.label}
+              {"badge" in link && link.badge ? (
+                <span
+                  className="ml-1.5 rounded px-1 py-0.5 text-[0.58rem] font-black uppercase"
+                  style={{ background: "#ff8f4d", color: "#000" }}
+                >
+                  New
+                </span>
+              ) : null}
             </Link>
           );
         })}

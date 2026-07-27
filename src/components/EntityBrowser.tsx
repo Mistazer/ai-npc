@@ -4,12 +4,12 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import clsx from "clsx";
 import { EntityIcon } from "./EntityIcon";
-import type { GameConfig } from "@/lib/types";
+import type { GameConfig, ImageSource } from "@/lib/types";
 
 export interface BrowseRow {
   slug: string;
   name: string;
-  icon: string | null;
+  icon: ImageSource;
   rarityLabel: string | null;
   rarityRank: number;
   facet: string | null;

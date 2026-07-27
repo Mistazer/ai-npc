@@ -1,8 +1,12 @@
+"use client";
+
 /* eslint-disable @next/next/no-img-element */
+import { useState } from "react";
 import clsx from "clsx";
 
 interface Props {
-  src: string | null;
+  /** URL principale, ou liste d'URL candidates essayées dans l'ordre. */
+  src: string | string[] | null;
   alt: string;
   rarity?: number;
   size?: number;
@@ -11,10 +15,21 @@ interface Props {
 }
 
 /**
- * Vignette d'entité. Les images proviennent de CDN externes non optimisables :
- * on utilise volontairement <img> avec chargement paresseux.
+ * Vignette d'entité, avec repli automatique sur les URL suivantes.
+ *
+ * Les visuels proviennent de CDN communautaires qui ferment régulièrement
+ * (Hakushin/nanoka.cc a disparu début 2026) : on essaie donc plusieurs sources
+ * successives avant d'afficher un remplacement textuel.
  */
 export function EntityIcon({ src, alt, rarity, size = 64, className, rounded = "lg" }: Props) {
+  const candidates = (Array.isArray(src) ? src : [src]).filter(Boolean) as string[];
+  const first = candidates[0] ?? "";
+
+  // State dérivé : on réinitialise l'index quand la source change, sans effet.
+  const [state, setState] = useState({ key: first, index: 0 });
+  const index = state.key === first ? state.index : 0;
+  if (state.key !== first) setState({ key: first, index: 0 });
+
   const radius = rounded === "full" ? "rounded-full" : rounded === "md" ? "rounded-md" : "rounded-xl";
   const gradient =
     rarity === 5
@@ -22,6 +37,8 @@ export function EntityIcon({ src, alt, rarity, size = 64, className, rounded = "
       : rarity === 4
         ? "linear-gradient(160deg,#4a3568,#7a5aa8)"
         : "linear-gradient(160deg,#2a3a4d,#3f5d7a)";
+
+  const current = candidates[index];
 
   return (
     <div
@@ -33,17 +50,19 @@ export function EntityIcon({ src, alt, rarity, size = 64, className, rounded = "
         borderColor: "var(--border-strong)",
       }}
     >
-      {src ? (
+      {current ? (
         <img
-          src={src}
+          key={current}
+          src={current}
           alt={alt}
           loading="lazy"
           decoding="async"
+          onError={() => setState({ key: first, index: index + 1 })}
           className="h-full w-full object-cover"
         />
       ) : (
-        <div className="flex h-full w-full items-center justify-center text-xs font-bold text-[var(--muted-dim)]">
-          {alt.slice(0, 2).toUpperCase()}
+        <div className="flex h-full w-full items-center justify-center px-1 text-center text-[0.6rem] font-bold leading-tight text-[var(--muted-dim)]">
+          {alt.slice(0, 12)}
         </div>
       )}
     </div>

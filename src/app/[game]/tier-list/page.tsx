@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { EntityIcon } from "@/components/EntityIcon";
 import { getGame } from "@/lib/games";
 import { getCharacterCards } from "@/lib/data";
 import { getTierListsForGame } from "@/content/tierlists";
@@ -38,7 +39,7 @@ export default async function TierListIndex({ params }: { params: Promise<{ game
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {lists.map((list) => {
           const top = list.entries
-            .filter((entry) => entry.tier === "S+")
+            .filter((entry) => entry.tier === "T0")
             .map((entry) => cards.find((card) => card.slug === entry.slug))
             .filter(Boolean)
             .slice(0, 6);
@@ -51,15 +52,7 @@ export default async function TierListIndex({ params }: { params: Promise<{ game
               </div>
               <div className="flex gap-1.5 border-t border-[var(--border)] p-3">
                 {top.map((card) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    key={card!.slug}
-                    src={card!.icon ?? ""}
-                    alt={card!.name}
-                    loading="lazy"
-                    title={card!.name}
-                    className="h-10 w-10 rounded-lg border border-[var(--border-strong)] object-cover"
-                  />
+                  <EntityIcon key={card!.slug} src={card!.icon} alt={card!.name} size={40} rarity={card!.rarityRank} />
                 ))}
               </div>
               <p className="border-t border-[var(--border)] px-4 py-2 text-[0.7rem] text-[var(--muted-dim)]">

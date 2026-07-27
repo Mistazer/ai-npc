@@ -6,8 +6,24 @@ import { getJson, mapLimit } from "./lib/github.mjs";
 import { cleanText, dedupeSlugs, slugify, step, writeJson } from "./lib/utils.mjs";
 
 const REPO = "Genshin-Optimizer/zzz-hakushin-data";
-const CDN = "https://static.nanoka.cc/zzz/UI";
-const asset = (file) => (file ? `${CDN}/${String(file).replace(/^.*\//, "").replace(/\.(png|webp)$/i, "")}.webp` : null);
+/**
+ * Hakushin (static.nanoka.cc) a fermé début 2026 : on génère donc plusieurs URL
+ * candidates par visuel, essayées dans l'ordre par le composant EntityIcon.
+ */
+const CDNS = [
+  "https://api.hakush.in/zzz/UI",
+  "https://static.nanoka.cc/zzz/UI",
+];
+
+const baseName = (file) =>
+  file ? String(file).replace(/^.*\//, "").replace(/\.(png|webp)$/i, "") : null;
+
+/** Renvoie la liste des URL candidates pour un visuel donné. */
+const asset = (file) => {
+  const name = baseName(file);
+  if (!name) return [];
+  return CDNS.map((cdn) => `${cdn}/${name}.webp`);
+};
 
 const RARITY = { 2: "B", 3: "A", 4: "S" };
 
@@ -27,6 +43,7 @@ const ELEMENT_FR = {
   Electric: "Électrique",
   Ether: "Éther",
   Frost: "Givre",
+  Wind: "Vent",
   "Auric Ink": "Encre aurique",
 };
 

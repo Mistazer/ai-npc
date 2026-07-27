@@ -29,6 +29,18 @@ export function Header() {
           ))}
           <span className="mx-1 h-4 w-px bg-[var(--border)]" />
           <Link
+            href="/beta"
+            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[0.83rem] font-medium text-[var(--muted)] transition hover:bg-[var(--panel)] hover:text-[var(--text)]"
+          >
+            Bêta
+            <span
+              className="rounded px-1 py-0.5 text-[0.58rem] font-black uppercase"
+              style={{ background: "#ff8f4d", color: "#000" }}
+            >
+              New
+            </span>
+          </Link>
+          <Link
             href="/actualites"
             className="rounded-lg px-3 py-1.5 text-[0.83rem] font-medium text-[var(--muted)] transition hover:bg-[var(--panel)] hover:text-[var(--text)]"
           >
@@ -52,6 +64,9 @@ export function Header() {
             {game.shortName}
           </Link>
         ))}
+        <Link href="/beta" className="chip" style={{ borderColor: "#ff8f4d", color: "#ff8f4d" }}>
+          Bêta
+        </Link>
         <Link href="/actualites" className="chip">
           Actualités
         </Link>

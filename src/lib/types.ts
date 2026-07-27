@@ -1,6 +1,7 @@
 export type GameId = "gi" | "hsr" | "zzz";
 
-export type Tier = "S+" | "S" | "A" | "B" | "C" | "D";
+/** Notation à la Prydwen : T0 est le sommet du méta. */
+export type Tier = "T0" | "T0.5" | "T1" | "T1.5" | "T2" | "T3";
 
 export interface GameConfig {
   id: GameId;
@@ -25,6 +26,10 @@ export interface GameConfig {
   };
   /** Catégories de tier list disponibles pour ce jeu. */
   tierModes: { id: string; label: string; description: string }[];
+  /** Colonnes de rôle des tier lists, façon Prydwen. */
+  tierColumns: { id: string; label: string; description: string }[];
+  /** Sources éditoriales de référence affichées sur les pages du jeu. */
+  sources: { label: string; url: string; note: string }[];
 }
 
 export interface Bonus {
@@ -32,12 +37,15 @@ export interface Bonus {
   effect: string;
 }
 
+/** URL unique, ou liste de candidates essayées dans l'ordre (CDN de secours). */
+export type ImageSource = string | string[] | null;
+
 export interface BaseEntity {
   game: GameId;
   id: string;
   slug: string;
   name: string;
-  images: { icon: string | null; splash?: string | null; [key: string]: string | null | undefined };
+  images: { icon: ImageSource; splash?: ImageSource; [key: string]: ImageSource | undefined };
 }
 
 export interface GiCharacter extends BaseEntity {
@@ -82,7 +90,7 @@ export interface GiArtifact extends BaseEntity {
   rarities: number[];
   rarity: number;
   bonuses: Bonus[];
-  pieces: { slot: string; name: string; description: string; icon: string | null }[];
+  pieces: { slot: string; name: string; description: string; icon: ImageSource }[];
   version: string | null;
 }
 
@@ -90,10 +98,10 @@ export interface HsrCharacter extends BaseEntity {
   rarity: number;
   path: string;
   pathFr: string;
-  pathIcon: string | null;
+  pathIcon: ImageSource;
   element: string;
   elementFr: string;
-  elementIcon: string | null;
+  elementIcon: ImageSource;
   maxSp: number | null;
   stats: {
     hp: number | null;
@@ -108,11 +116,11 @@ export interface HsrCharacter extends BaseEntity {
     name: string;
     type: string;
     effect: string | null;
-    icon: string | null;
+    icon: ImageSource;
     simple: string;
     description: string;
   }[];
-  eidolons: { level: number; name: string; icon: string | null; description: string }[];
+  eidolons: { level: number; name: string; icon: ImageSource; description: string }[];
 }
 
 export interface HsrLightCone extends BaseEntity {
@@ -198,14 +206,16 @@ export interface CharacterCard {
   role: string | null;
   roleFr: string | null;
   extra: string | null;
-  icon: string | null;
-  splash: string | null;
+  icon: ImageSource;
+  splash: ImageSource;
 }
 
 /** Entrée de tier list éditoriale. */
 export interface TierEntry {
   slug: string;
   tier: Tier;
+  /** Colonne de rôle (voir `tierColumns` du jeu). */
+  column: string;
   note?: string;
 }
 
@@ -215,11 +225,15 @@ export interface TierList {
   label: string;
   description: string;
   updated: string;
+  /** Références utilisées pour établir le classement. */
+  sources?: { label: string; url: string }[];
   entries: TierEntry[];
 }
 
 export interface BuildBlock {
   title: string;
+  /** Étiquette courte : « Recommandé », « Budget », « F2P »… */
+  badge?: string;
   items: string[];
   note?: string;
 }
@@ -233,6 +247,19 @@ export interface CharacterGuide {
   builds: BuildBlock[];
   teams: { name: string; members: string[]; note?: string }[];
   verdict?: string;
+  /** Références consultées pour rédiger le guide. */
+  sources?: { label: string; url: string }[];
+}
+
+/** Personnage annoncé mais non encore sorti (contenu bêta / CBT). */
+export interface BetaEntry {
+  game: GameId;
+  slug: string;
+  /** Version du jeu prévue, ex. « 3.2 ». */
+  version: string;
+  status: "Bêta" | "Annoncé" | "Datamine";
+  summary: string;
+  kit?: string[];
 }
 
 export interface NewsItem {

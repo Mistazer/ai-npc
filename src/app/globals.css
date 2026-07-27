@@ -13,12 +13,12 @@
   --accent: #7c9cff;
   --accent-soft: rgba(124, 156, 255, 0.14);
 
-  --tier-splus: #ff5470;
-  --tier-s: #ff8f4d;
-  --tier-a: #ffd23f;
-  --tier-b: #62d98a;
-  --tier-c: #56b6ff;
-  --tier-d: #9aa4bd;
+  --tier-t0: #ff5470;
+  --tier-t05: #ff8f4d;
+  --tier-t1: #ffd23f;
+  --tier-t15: #9ede5a;
+  --tier-t2: #56b6ff;
+  --tier-t3: #9aa4bd;
 
   --r-5: #ffb938;
   --r-4: #a682e0;
@@ -196,21 +196,21 @@ body::before {
   --rarity: var(--r-3);
 }
 
-.tier-splus {
-  --tier: var(--tier-splus);
+.tier-t0 {
+  --tier: var(--tier-t0);
 }
-.tier-s {
-  --tier: var(--tier-s);
+.tier-t05 {
+  --tier: var(--tier-t05);
 }
-.tier-a {
-  --tier: var(--tier-a);
+.tier-t1 {
+  --tier: var(--tier-t1);
 }
-.tier-b {
-  --tier: var(--tier-b);
+.tier-t15 {
+  --tier: var(--tier-t15);
 }
-.tier-c {
-  --tier: var(--tier-c);
+.tier-t2 {
+  --tier: var(--tier-t2);
 }
-.tier-d {
-  --tier: var(--tier-d);
+.tier-t3 {
+  --tier: var(--tier-t3);
 }

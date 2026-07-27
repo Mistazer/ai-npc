@@ -42,9 +42,16 @@ export function GuideSection({ guide, game }: { guide: CharacterGuide; game: Gam
         <div className="space-y-3">
           {guide.builds.map((build) => (
             <div key={build.title} className="rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] p-3">
-              <p className="mb-2 text-[0.83rem] font-bold" style={{ color: game.accent }}>
-                {build.title}
-              </p>
+              <div className="mb-2 flex flex-wrap items-center gap-2">
+                <p className="text-[0.83rem] font-bold" style={{ color: game.accent }}>
+                  {build.title}
+                </p>
+                {build.badge ? (
+                  <span className="chip chip-accent" style={{ borderColor: game.accent, color: game.accent }}>
+                    {build.badge}
+                  </span>
+                ) : null}
+              </div>
               <ul className="space-y-1">
                 {build.items.map((item) => (
                   <li key={item} className="flex gap-2 text-[0.8rem] leading-snug text-[var(--muted)]">
@@ -101,6 +108,24 @@ export function GuideSection({ guide, game }: { guide: CharacterGuide; game: Gam
       {guide.verdict ? (
         <Panel title="Verdict">
           <p className="text-[0.87rem] leading-relaxed text-[var(--muted)]">{guide.verdict}</p>
+        </Panel>
+      ) : null}
+
+      {guide.sources && guide.sources.length > 0 ? (
+        <Panel title="Sources consultées">
+          <div className="flex flex-wrap gap-2">
+            {guide.sources.map((source) => (
+              <a
+                key={source.url}
+                href={source.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="chip transition hover:border-[var(--accent)]"
+              >
+                {source.label} ↗
+              </a>
+            ))}
+          </div>
         </Panel>
       ) : null}
     </div>
