@@ -1,0 +1,2 @@
+Déclencheur du pipeline de traduction FR (le pousser relance le workflow).
+Run #1 — 2026-08-04 — makeine_vol9-revisionmtl.epub → Français
