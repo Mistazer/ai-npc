@@ -1,0 +1,59 @@
+name: Traduire en français
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  traduire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: arena/019fc95e-ai-npc
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Dépendances
+        run: |
+          pip install --quiet argostranslate beautifulsoup4 lxml xhtml2pdf
+          sudo apt-get update -qq && sudo apt-get install -y -qq wkhtmltopdf fonts-dejavu-core fonts-dejavu-extra
+
+      - name: Modèle de traduction EN→FR
+        run: |
+          argospm update
+          argospm install translate-en_fr
+
+      - name: EPUB source
+        run: |
+          curl -sL -o makeine_vol9.epub \
+            https://raw.githubusercontent.com/Mistazer/ai-npc/main/makeine_vol9-revisionmtl.epub
+          ls -la makeine_vol9.epub
+
+      - name: Traduction + EPUB + PDF
+        run: |
+          FROM_CODE=en TO_CODE=fr \
+          EPUB_SRC=makeine_vol9.epub OUT_DIR=output \
+          BASE_NAME=Makeine_vol9_FR_sans-serif \
+          python translation-pipeline/translate.py
+
+      - name: Publier sur la branche
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add output/
+          git commit -m "Traduction FR (sans-serif, noms adaptés) [skip ci]" || echo "rien à commiter"
+          git push
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: makeine-vol9-fr
+          path: |
+            output/Makeine_vol9_FR_sans-serif.epub
+            output/Makeine_vol9_FR_sans-serif.pdf
+            output/rapport.txt
